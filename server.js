@@ -2,11 +2,15 @@ const express = require('express');
 const superagent = require('superagent');
 const app = express();
 const cors = require('cors');
+const pg = require('pg');
+
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
+const client = new pg.Client(process.env.DATABASE_BASE);
+client.connect();
 
-// app.use('cors');
+app.use('cors');
 
 app.get('/location', (request, response) => {
   try {
