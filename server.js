@@ -22,10 +22,8 @@ app.get('/location', (request, response) => {
 });
 
 /*error handeling*/
-const handleErrors = (res) => {
-  res
-    .status(500)
-    .send({ Status: 500, responseText: 'Sorry, something went wrong!' });
+const handleError = (res) => {
+  res.status(500).send({ Status: 500, responseText: 'Sorry, something went wrong!' });
 };
 
 /*start on port*/
@@ -33,8 +31,11 @@ app.listen(PORT, () => console.log(`Never fear! ${PORT} is here!!`));
 
 /* location stuff */
 function getLocation (request, response) {
+
   const locationHandler = {
+
     query : request.query.data,
+
     cacheHit :(results) => {
       console.log('got data');
       response.send(results.rows[0]);
