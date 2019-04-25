@@ -4,9 +4,10 @@ const app = express();
 const cors = require('cors');
 const pg = require('pg');
 
+/*load env*/
 require('dotenv').config();
 
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) throw 'DATABASE_URL is missing!';
 const client = new pg.Client(DATABASE_URL);
@@ -15,12 +16,22 @@ client.on('err', err => console.log(err));
 
 app.use(cors());
 
-/* location stuff */
-
+/* rounte handelers*/ 
 app.get('/location', (request, response) => {
   getLocation(request, response);
 });
 
+/*error handeling*/
+const handleErrors = (res) => {
+  res
+    .status(500)
+    .send({ Status: 500, responseText: 'Sorry, something went wrong!' });
+};
+
+/*start on port*/
+app.listen(PORT, () => console.log(`Never fear! ${PORT} is here!!`));
+
+/* location stuff */
 function getLocation (request, response) {
   const locationHandler = {
     query : request.query.data,
@@ -128,12 +139,4 @@ function Weather(el) {
 // };
 
 
-// ERROR HANDLING
 
-// const handleErrors = (res) => {
-//   res
-//     .status(500)
-//     .send({ Status: 500, responseText: 'Sorry, something went wrong!' });
-// };
-
-app.listen(port, () => console.log('Listening!!!'));
