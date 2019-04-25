@@ -16,9 +16,13 @@ client.on('err', err => console.log(err));
 
 app.use(cors());
 
-/* rounte handelers*/ 
+/* rounte handelers*/
 app.get('/location', (request, response) => {
   getLocation(request, response);
+});
+
+app.get('/weather', (request, response) => {
+  getWeather(request, response);
 });
 
 /*error handeling*/
@@ -29,11 +33,10 @@ const handleError = (res) => {
 /*start on port*/
 app.listen(PORT, () => console.log(`Never fear! ${PORT} is here!!`));
 
-/* location stuff */
+/* location */
 function getLocation (request, response) {
 
   const locationHandler = {
-
     query : request.query.data,
 
     cacheHit :(results) => {
@@ -73,7 +76,6 @@ Location.fetchLocation = (query) => {
       console.log('Got data from API', res);
       if ( ! res.body.results.length ) { throw 'No Data'; }
       else {
-        // Create an instance and save it
         let location = new Location(query, res.body.results[0]);
         return location.save()
           .then( result => {
@@ -101,12 +103,7 @@ Location.prototype.save = function() {
 };
 
 
-/*weather stuff*/
-
-app.get('/weather', (request, response) => {
-  getWeather(request, response);
-});
-
+/*weather*/
 const getWeather = (request, response) => {
   let url = `https://api.darksky.net/forecast/${process.env.WEATHERKEY}/lat=${request.query.lat}&${request.query.lng}`;
 
