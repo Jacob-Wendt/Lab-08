@@ -24,13 +24,13 @@ app.get('/location', (request, response) => {
 function getLocation (request, response) {
   const locationHandler = {
     query : request.query.data,
-    chaseHit :(results) => {
+    cacheHit :(results) => {
       console.log('got data');
       response.send(results.rows[0]);
     },
-    chaseMiss : () => {
+    cacheMiss : () => {
       console.log('no data');
-      Location.fetchLocation(request.query.dat)
+      Location.fetchLocation(request.query.data)
         .then(data => response.send(data));
     }
   };
@@ -55,19 +55,19 @@ Location.lookupLocation = (handler => {
 });
 
 Location.fetchLocation = (query) => {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-  return superagent.get(url)
-    .then (res => {
-      console.log('got stuff');
-      if(!data.body.results.length) {
-        throw 'no data';
-      }
+  const _URL = `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.GEOCODE_API_KEY}`;
+  return superagent.get(_URL)
+    .then( res => {
+      console.log('Got data from API', res);
+      if ( ! res.body.results.length ) { throw 'No Data'; }
       else {
-        let location = new Location (query, res.body.results[0]);
-        return location.save().then(results => {
-          location.id = results.rows[0].id;
-          return location;
-        });
+        // Create an instance and save it
+        let location = new Location(query, res.body.results[0]);
+        return location.save()
+          .then( result => {
+            location.id = result.rows[0].id;
+            return location;
+          });
       }
     });
 };
@@ -114,27 +114,26 @@ function Weather(el) {
   this.time = new Date(el.time * 1000).toString().slice(0, 15);
 }
 
-const findLatLong = (request, response) => {
-  let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
+// const findLatLong = (request, response) => {
+//   let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
 
-  return superagent.get(url)
-    .then(res => {
-      response.send(new Location(request.query.data, res));
-    }).catch(error => {
-      console.log(error);
-      // res.status(500);
-      response.send('Something went wrong!');
-    });
-};
-
+//   return superagent.get(url)
+//     .then(res => {
+//       response.send(new Location(request.query.data, res));
+//     }).catch(error => {
+//       console.log(error);
+//       // res.status(500);
+//       response.send('Something went wrong!');
+//     });
+// };
 
 
 // ERROR HANDLING
 
-const handleErrors = (res) => {
-  res
-    .status(500)
-    .send({ Status: 500, responseText: 'Sorry, something went wrong!' });
-};
+// const handleErrors = (res) => {
+//   res
+//     .status(500)
+//     .send({ Status: 500, responseText: 'Sorry, something went wrong!' });
+// };
 
 app.listen(port, () => console.log('Listening!!!'));
