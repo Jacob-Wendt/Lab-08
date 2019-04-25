@@ -7,10 +7,13 @@ const pg = require('pg');
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
-const client = new pg.Client(process.env.DATABASE_BASE);
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw 'DATABASE_URL is missing!';
+const client = new pg.Client(DATABASE_URL);
 client.connect();
+client.on('err', err => console.log(err));
 
-app.use('cors');
+app.use(cors());
 
 app.get('/location', (request, response) => {
   try {
